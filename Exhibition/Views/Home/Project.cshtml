@@ -1,0 +1,58 @@
+﻿@model List<Exhibition.Models.Project>
+@{
+    ViewData["Title"] = "Project";
+}
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+<div class="container">
+    <h1>Hello, world!</h1>
+    <div class="row">
+        <div class="col-md-9">
+            <table class="table table-striped">
+                <caption>原有项目信息</caption>
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Id)</th>
+                        <th>名称</th>
+                        <th>描述</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+    {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.pName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Discribe)
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3" style="background-color: #dedef8;box-shadow: inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
+            <h4>新增项目信息</h4>
+            <form role="form"  method="post" asp-controller="Work" asp-action="NewProject">
+                <div class="form-group">
+                    <label for="name">项目名称</label>
+                    <input type="text" class="form-control" name="pName" placeholder="请输入名称">
+                </div>
+                <div class="form-group">
+                    <label for="inputfile">项目描述</label>
+                    <textarea class="form-control" name="Discribe" rows="6">
+项目时间：
+应用领域：
+项目信息：
+</textarea>
+                </div>
+                <button type="submit" class="btn btn-default">提交</button>
+                <br />
+            </form>
+        </div>
+    </div>
+</div>

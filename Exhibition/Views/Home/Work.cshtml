@@ -1,0 +1,53 @@
+﻿@model  Exhibition.Models.WorkItem
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+    <ol class="carousel-indicators">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+        @for (int i = 1; i < Model.imgs.Count; i++)
+        {
+            <li data-target="#myCarousel" data-slide-to="@i"></li>
+        }
+    </ol>
+    <div class="carousel-inner" role="listbox">
+        <div class="item active">
+            <img src="@Model.imgs[0].Src" alt="ASP.NET" class="img-responsive" />
+            <div class="carousel-caption" role="option">
+                <p>@Model.imgs[0].Discribe</p>
+            </div>
+        </div>
+        @for (int i = 1; i < Model.imgs.Count; i++)
+        {
+            <div class="item">
+                <img src="@Model.imgs[i].Src" alt="Visual Studio" class="img-responsive" />
+                <div class="carousel-caption" role="option">
+                    <p>@Model.imgs[i].Discribe</p>
+                </div>
+            </div>
+        }
+    </div>
+    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>@Model.wName</h2>
+        <ul>
+            <li>@Model.wId</li>
+            <li>@Model.author</li>
+            <li>@Model.editTime</li>
+            <li>@Model.Discribe</li>
+            <li>项目 @Model.projId ：@Model.proj.pName</li>
+            <li>@Model.proj.Discribe</li>
+        </ul>
+    </div>
+</div>
