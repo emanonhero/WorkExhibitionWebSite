@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-//Sqlite清空表并重置自增ID
+//Sqlite清空表并重置自增ID。
 //DELETE FROM 'TblName';
 //DELETE FROM sqlite_sequence WHERE name = 'TblName';
 namespace Exhibition.Models
