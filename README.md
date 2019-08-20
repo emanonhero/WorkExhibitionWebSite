@@ -1,0 +1,2 @@
+# WorkExhibitionWebSite
+.net core
