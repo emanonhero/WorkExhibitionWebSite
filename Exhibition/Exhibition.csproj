@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Deploy\**" />
+    <Content Remove="Deploy\**" />
+    <EmbeddedResource Remove="Deploy\**" />
+    <None Remove="Deploy\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Migrations\20190820030353_timestamp.cs" />
     <Compile Remove="Migrations\20190820030353_timestamp.Designer.cs" />
   </ItemGroup>

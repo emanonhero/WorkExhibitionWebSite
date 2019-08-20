@@ -7,6 +7,7 @@ using Exhibition.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 namespace Exhibition.Controllers
 {
@@ -26,7 +27,9 @@ namespace Exhibition.Controllers
         public ActionResult<string> Get()
         {
             string res = string.Empty;
-            foreach (var w in _workContext.works)
+            //使用Include方法指定要包含在查询结果中的关联数据。关联数据可以是有层级的，可通过链式调用ThenInclude，进一步包含更深级别的关联数据。
+            //https://www.cnblogs.com/youring2/p/11186614.html
+            foreach (var w in _workContext.works.Include(w => w.imgs).Include(w => w.proj).ToArray())
             {
                 res += JsonConvert.SerializeObject(w) + Environment.NewLine;
             }
@@ -40,11 +43,14 @@ namespace Exhibition.Controllers
             {
                 return null;
             }
-            item.proj = _workContext.projects.Find(item.projId);
-            var query = from img in _workContext.imgs
-                        where img.wId == id
-                        select img;
-            item.imgs = query.ToList();
+            //显式加载
+            _workContext.Entry(item).Collection(w => w.imgs).Load();//加载集合使用Collection方法
+            _workContext.Entry(item).Reference(w => w.proj).Load();//加载单个实体使用Reference方法
+            //item.proj = _workContext.projects.Find(item.projId);
+            //var query = from img in _workContext.imgs
+            //            where img.wId == id
+            //            select img;
+            //item.imgs = query.ToList();
             return item.ToString();
         }
         [HttpPost("UploadFiles")]

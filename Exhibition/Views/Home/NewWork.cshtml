@@ -32,7 +32,7 @@
     <div class="form-group">
         <label for="inputfile">文件输入</label>
         <input id="file-zh" name="files" type="file" multiple onchange="fileCountCheck(this)">
-        <p class="help-block">支持视频和图片文件。</p>
+        <p class="help-block">支持视频和图片文件。视频格式建议采用H.264 and AAC的MP4格式。</p>
     </div>
     <div id="imgs_d" class="form-group">
     </div>
@@ -54,7 +54,7 @@
                 language: 'zh', //设置语言
                 //theme: "fas",
                 //uploadUrl: uploadUrl, //上传的地址
-                allowedFileExtensions: ['jpg', 'png', 'gif', 'mp4'],//接收的文件后缀
+                allowedFileExtensions: ['jpg','jpeg','bmp', 'png', 'gif', 'mp4','mov','avi'],//接收的文件后缀
                 showUpload: false, //是否显示上传按钮
                 showCaption: false,//是否显示标题
                 browseClass: "btn btn-primary", //按钮样式

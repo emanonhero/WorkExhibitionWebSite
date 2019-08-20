@@ -56,11 +56,14 @@ namespace Exhibition.Controllers
             {
                 return null;
             }
-            item.proj = _workContext.projects.Find(item.projId);
-            var query = from img in _workContext.imgs
-                        where img.wId == id
-                        select img;
-            item.imgs = query.ToList();
+            //显式加载
+            _workContext.Entry(item).Collection(w => w.imgs).Load();//加载集合使用Collection方法
+            _workContext.Entry(item).Reference(w => w.proj).Load();//加载单个实体使用Reference方法
+            //item.proj = _workContext.projects.Find(item.projId);
+            //var query = from img in _workContext.imgs
+            //            where img.wId == id
+            //            select img;
+            //item.imgs = query.ToList();
             item.imgs.ForEach(p => p.Src = p.Src.Replace("~", ".."));
             return View(item);
         }
