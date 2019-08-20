@@ -13,19 +13,43 @@
     </ol>
     <div class="carousel-inner" role="listbox">
         <div class="item active">
-            <img src="@Model.imgs[0].Src" alt="ASP.NET" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>@Model.imgs[0].Discribe</p>
-            </div>
+            @if (@Model.imgs[0].Src.Substring(Model.imgs[0].Src.LastIndexOf(".") + 1, (Model.imgs[0].Src.Length - Model.imgs[0].Src.LastIndexOf(".") - 1)) == "mp4")
+            {
+                <video controls="controls" class="img-responsive">
+                    <source src="@Model.imgs[0].Src" type="video/mp4" />
+                    <div class="carousel-caption" role="option">
+                        <p>@Model.imgs[0].Discribe</p>
+                    </div>
+                </video>
+            }
+            else
+            {
+                <img src="@Model.imgs[0].Src" alt="ASP.NET" class="img-responsive" />
+                <div class="carousel-caption" role="option">
+                    <p>@Model.imgs[0].Discribe</p>
+                </div>
+            }
         </div>
         @for (int i = 1; i < Model.imgs.Count; i++)
         {
-            <div class="item">
-                <img src="@Model.imgs[i].Src" alt="Visual Studio" class="img-responsive" />
+        <div class="item">
+            @if (@Model.imgs[i].Src.Substring(Model.imgs[i].Src.LastIndexOf(".") + 1, (Model.imgs[i].Src.Length - Model.imgs[i].Src.LastIndexOf(".") - 1)) == "mp4")
+            {
+                <video controls="controls" class="img-responsive">
+                    <source src="@Model.imgs[i].Src" type="video/mp4" />
+                    <div class="carousel-caption" role="option">
+                        <p>@Model.imgs[i].Discribe</p>
+                    </div>
+                </video>
+            }
+            else
+            {
+                <img src="@Model.imgs[i].Src" alt="ASP.NET" class="img-responsive" />
                 <div class="carousel-caption" role="option">
                     <p>@Model.imgs[i].Discribe</p>
                 </div>
-            </div>
+            }
+        </div>
         }
     </div>
     <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">

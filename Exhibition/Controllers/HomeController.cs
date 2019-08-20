@@ -46,7 +46,7 @@ namespace Exhibition.Controllers
         public IActionResult Index()
         {
             if (_workContext.works.Count() == 0) return RedirectToAction("Project");
-            return RedirectToAction("Work", "Home", new { id = new Random().Next(1, _workContext.works.Count()) });
+            return RedirectToAction("Work", "Home", new { id = new Random().Next(1, _workContext.works.Count()+1) });
         }
         [HttpGet("[action]/{id}")]
         public IActionResult Work(int id)
