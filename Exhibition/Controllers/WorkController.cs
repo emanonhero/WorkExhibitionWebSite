@@ -53,6 +53,39 @@ namespace Exhibition.Controllers
             //item.imgs = query.ToList();
             return item.ToString();
         }
+        [HttpPost("[action]")]
+        public IActionResult DeleteWork([FromForm]int deleteId, [FromForm]string deleteCode)
+        {
+            var codes = deleteCode.Split('.');
+            var item = _workContext.works.Where(w => w.wId == deleteId).Include(i=>i.imgs).Single();
+            List<ImgOrVideo> list = item.imgs.ToList();
+            if (codes.Count()!=list.Count)
+            { throw new Exception("codes Error"); }
+            for (int i = 0; i < list.Count; i++)
+            {
+                ImgOrVideo img = list[i];
+                if (codes[i].Length==12&&Path.GetFileNameWithoutExtension( img.Src).EndsWith(codes[i]))
+                {
+                    _workContext.imgs.Remove(img);
+                    img.Src = Path.Combine(_hostingEnvironment.WebRootPath, "works", Path.GetFileName(img.Src));
+                }
+                else { throw new Exception("Code Error"); }
+            }
+            _workContext.works.Remove(item);
+            for (int i = 0; i < list.Count; i++)
+            {
+                if(System.IO.File.Exists(list[i].Src))
+                {
+                    System.IO.File.Delete(list[i].Src);
+                }
+                else
+                {
+                    Console.WriteLine("not exist:" + list[i].Src);
+                }
+            }            
+            _workContext.SaveChanges();
+            return Ok(new { count = list.Count });
+        }
         [HttpPost("UploadFiles")]
         public async Task<IActionResult> Post(List<IFormFile> files)
         {
