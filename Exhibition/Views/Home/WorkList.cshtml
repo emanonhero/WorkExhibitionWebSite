@@ -1,0 +1,111 @@
+﻿@model IEnumerable<Exhibition.Models.WorkItem>
+
+@{
+    ViewData["Title"] = "作品集列表";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<h2>WorkList<</h2>*@
+<h4><a asp-action="NewWork">点击上传新作品集</a></h4>
+<form role="form" method="post" id="searchform" asp-controller="Home" asp-action="Search">
+    <div class="col-sm-2">
+        <div class="form-group">
+            <label for="name">选择搜索类别</label>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="form-group">
+            <select class="form-control" id="option" name="option">
+                <option value=0>作品集描述</option>
+                <option value=1>作品集名称</option>
+                <option value=2>作品集作者</option>
+                <option value=3>图片描述</option>
+                <option value=4>项目名称</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-7">
+        <div class="input-group">
+            <input type="text" class="form-control" id="key" name="key" />@*onkeydown="onKeyDown(event)"*@
+            <span class="input-group-addon" onclick="onSearch()"><i class="glyphicon glyphicon-search"></i></span>
+        </div>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.wName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.proj)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Discribe)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.editTime)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.wName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.author)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.proj.pName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Discribe)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.editTime)
+                </td>
+                <td>
+                    @*<a asp-action="Edit" asp-route-id="@item.wId">Edit</a>*@ |
+                    <a asp-action="Work" asp-route-id="@item.wId">详情</a> |
+                    @*<a asp-action="Delete" asp-route-id="@item.wId">Delete</a>*@
+                    <a  onclick="DeleteThisWork(@item.wId)">删除</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts{
+    <script type="text/javascript">
+        function onKeyDown(event) {
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+            if (e && e.keyCode == 27) { // 按 Esc
+                //要做的事情
+            }
+            if (e && e.keyCode == 113) { // 按 F2
+                //要做的事情
+            }
+            if (e && e.keyCode == 13) { // enter 键
+                onSearch();
+            }
+
+        }
+        function onSearch() {
+            var form = document.getElementById('searchform');
+            //再次修改input内容
+            form.submit();
+            //console.log("searchform");
+        }
+        function DeleteThisWork(wId) {
+            if (window.confirm("确定要删除本作品集及其相关图片和视频吗？")) {
+                window.alert('抱歉，您尚无权限删除作品集：'+wId);
+            }
+        }
+    </script>
+}

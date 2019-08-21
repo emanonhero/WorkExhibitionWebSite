@@ -133,6 +133,7 @@ namespace Exhibition.Controllers
             _workContext.SaveChanges();
             //return Ok(new { newPro });
             return RedirectToAction("Project", "Home");
-        }
+        }        
+        
     }
 }

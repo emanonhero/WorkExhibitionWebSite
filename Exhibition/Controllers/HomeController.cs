@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Exhibition.Models;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
 
 namespace Exhibition.Controllers
 {
@@ -45,8 +46,46 @@ namespace Exhibition.Controllers
         }
         public IActionResult Index()
         {
-            if (_workContext.works.Count() == 0) return RedirectToAction("Project");
-            return RedirectToAction("Work", "Home", new { id = new Random().Next(1, _workContext.works.Count()+1) });
+            //if (_workContext.works.Count() == 0) return RedirectToAction("Project");
+            //return RedirectToAction("Work", "Home", new { id = new Random().Next(1, _workContext.works.Count()+1) });
+            return View("WorkList", _workContext.works.Include(w => w.proj).OrderByDescending(w => w.editTime).ToList() );
+        }
+        [HttpPost("[action]")]
+        public IActionResult Search([FromForm]int option, [FromForm]string key)
+        {
+            List<WorkItem> res = new List<WorkItem>();
+            if (!string.IsNullOrEmpty(key))
+            {
+                switch (option)
+                {
+                    case 0://作品集描述
+                        res = _workContext.works.Where(item => item.Discribe.Contains(key, StringComparison.OrdinalIgnoreCase)).Include(w => w.proj).OrderByDescending(w => w.editTime).ToList();
+                        break;
+                    case 1://作品集名称
+                        res = _workContext.works.Where(item => item.wName.Contains(key, StringComparison.OrdinalIgnoreCase)).Include(w => w.proj).OrderByDescending(w => w.editTime).ToList();
+                        break;
+                    case 2://作品集作者
+                        res = _workContext.works.Where(item => item.author.Contains(key, StringComparison.OrdinalIgnoreCase)).Include(w => w.proj).OrderByDescending(w => w.editTime).ToList();
+                        break;
+                    case 3://图片描述
+                           //var imgs = _workContext.imgs.Where(img => img.Discribe.Contains(key)).Select(w=>w.wId);
+                           //var qq=from a in 
+                           //var ii = _workContext.imgs.DefaultIfEmpty(img => img.Discribe.Contains(key, StringComparison.OrdinalIgnoreCase));
+                           //res = _workContext.works.Where(item=>item.imgs.Where(img => img.Discribe.Contains(key, StringComparison.OrdinalIgnoreCase)).Count()!=0).Include(w => w.proj).OrderByDescending(w => w.editTime).ToList();                        
+                        res = _workContext.works.Where(item => item.imgs.Any(img => img.Discribe.Contains(key, StringComparison.OrdinalIgnoreCase))).Include(w => w.proj).OrderByDescending(w => w.editTime).ToList();//any all
+                        break;
+                    case 4://项目名称
+                        res = _workContext.works.Where(item => item.proj.pName.Contains(key,StringComparison.OrdinalIgnoreCase)).Include(w => w.proj).OrderByDescending(w => w.editTime).ToList();
+                        break;
+                    default:
+                        throw new Exception("未知搜索参数");
+                }
+            }
+            return View("WorkList", res );
+        }
+        public IActionResult WorkList(List<WorkItem> items)
+        {
+            return View(items);
         }
         [HttpGet("[action]/{id}")]
         public IActionResult Work(int id)

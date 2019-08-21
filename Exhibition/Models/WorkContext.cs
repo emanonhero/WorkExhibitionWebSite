@@ -72,6 +72,7 @@ namespace Exhibition.Models
         public string Discribe { get; set; }
         [ForeignKey("WorkItem")]
         public int wId { get; set; }
+        public virtual WorkItem work { get; set; }
     }
     public class Project
     {
