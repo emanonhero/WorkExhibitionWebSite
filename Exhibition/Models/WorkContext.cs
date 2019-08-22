@@ -72,7 +72,7 @@ namespace Exhibition.Models
         public string Discribe { get; set; }
         [ForeignKey("WorkItem")]
         public int wId { get; set; }
-        public virtual WorkItem work { get; set; }
+        //public virtual WorkItem work { get; set; }//错误：会出现循环调用
     }
     public class Project
     {

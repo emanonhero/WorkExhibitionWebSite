@@ -24,7 +24,7 @@ namespace Exhibition.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
         [HttpGet]
-        public ActionResult<string> Get()
+        public ActionResult Get()
         {
             string res = string.Empty;
             //使用Include方法指定要包含在查询结果中的关联数据。关联数据可以是有层级的，可通过链式调用ThenInclude，进一步包含更深级别的关联数据。
@@ -33,7 +33,7 @@ namespace Exhibition.Controllers
             {
                 res += JsonConvert.SerializeObject(w) + Environment.NewLine;
             }
-            return res;
+            return Ok(new { type = "works", res = _workContext.works.Include(w => w.imgs).Include(w => w.proj).ToArray() });
         }
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
@@ -41,7 +41,7 @@ namespace Exhibition.Controllers
             var item = _workContext.works.Find(id);
             if (item == null)
             {
-                return null;
+                throw new Exception("nothing find");
             }
             //显式加载
             _workContext.Entry(item).Collection(w => w.imgs).Load();//加载集合使用Collection方法
@@ -51,7 +51,11 @@ namespace Exhibition.Controllers
             //            where img.wId == id
             //            select img;
             //item.imgs = query.ToList();
-            return item.ToString();
+            return Ok(new
+            {
+                type = "work",
+                res = item
+            });
         }
         [HttpPost("[action]")]
         public IActionResult DeleteWork([FromForm]int deleteId, [FromForm]string deleteCode)
@@ -67,7 +71,7 @@ namespace Exhibition.Controllers
                 if (codes[i].Length==12&&Path.GetFileNameWithoutExtension( img.Src).EndsWith(codes[i]))
                 {
                     _workContext.imgs.Remove(img);
-                    img.Src = Path.Combine(_hostingEnvironment.WebRootPath, "works", Path.GetFileName(img.Src));
+                    img.Src = Path.Combine(_hostingEnvironment.WebRootPath, img.Src.Remove(0,2));
                 }
                 else { throw new Exception("Code Error"); }
             }
@@ -86,34 +90,34 @@ namespace Exhibition.Controllers
             _workContext.SaveChanges();
             return Ok(new { count = list.Count });
         }
-        [HttpPost("UploadFiles")]
-        public async Task<IActionResult> Post(List<IFormFile> files)
-        {
-            //var files = Request.Form.Files;
-            //long size = files.Sum(f => f.Length);
-            string webRootPath = _hostingEnvironment.WebRootPath;
-            string contentRootPath = _hostingEnvironment.ContentRootPath;
-            long size = files.Sum(f => f.Length);
-            List<string> localFiles = new List<string>();
-            foreach (var formFile in files)
-            {
-                if (formFile.Length > 0)
-                {
-                    string newFileName = GetFileGuidName(formFile.FileName) + GetFileExt(formFile.FileName); //随机生成新的文件名
-                    var filePath = Path.Combine(webRootPath, "works", newFileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await formFile.CopyToAsync(stream);
-                    }
-                    localFiles.Add(filePath);
-                }
-            }
+        //[HttpPost("UploadFiles")]
+        //public async Task<IActionResult> Post(List<IFormFile> files)
+        //{
+        //    //var files = Request.Form.Files;
+        //    //long size = files.Sum(f => f.Length);
+        //    string webRootPath = _hostingEnvironment.WebRootPath;
+        //    string contentRootPath = _hostingEnvironment.ContentRootPath;
+        //    long size = files.Sum(f => f.Length);
+        //    List<string> localFiles = new List<string>();
+        //    foreach (var formFile in files)
+        //    {
+        //        if (formFile.Length > 0)
+        //        {
+        //            string newFileName = GetFileGuidName(formFile.FileName) + GetFileExt(formFile.FileName); //随机生成新的文件名
+        //            var filePath = Path.Combine(webRootPath, "works", newFileName);
+        //            using (var stream = new FileStream(filePath, FileMode.Create))
+        //            {
+        //                await formFile.CopyToAsync(stream);
+        //            }
+        //            localFiles.Add(filePath);
+        //        }
+        //    }
 
-            // process uploaded files
-            // Don't rely on or trust the FileName property without validation.
+        //    // process uploaded files
+        //    // Don't rely on or trust the FileName property without validation.
 
-            return Ok(new { count = files.Count, size, localFiles });
-        }
+        //    return Ok(new { count = files.Count, size, localFiles });
+        //}
 
         private string GetFileExt(string fileName) => Path.GetExtension(fileName).ToLower();
         private string GetFileGuidName(string fileName)
@@ -137,12 +141,12 @@ namespace Exhibition.Controllers
                 if (formFile.Length > 0)
                 {
                     string newFileName = GetFileGuidName(formFile.FileName) + GetFileExt(formFile.FileName); //随机生成新的文件名
-                    var filePath = Path.Combine(webRootPath, "works", newFileName);
+                    var filePath = Path.Combine(webRootPath, "works", projId.ToString(), newFileName);
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await formFile.CopyToAsync(stream);
                     }
-                    newWork.imgs.Add(new ImgOrVideo() { Src = "~/works/" + newFileName ,Discribe=imgDiscribe[i]});
+                    newWork.imgs.Add(new ImgOrVideo() { Src = "~/works/"+ projId.ToString()+"/" + newFileName ,Discribe=imgDiscribe[i]});
                 }
             }
 
@@ -159,14 +163,33 @@ namespace Exhibition.Controllers
         }
 
         [HttpPost("[action]")]
-        public IActionResult NewProject([FromForm]string pName, [FromForm]string Discribe)
+        public IActionResult NewProject([FromForm]string pName, [FromForm]string Discribe,[FromForm]string token)
         {
+            if (token != "110") throw new Exception("wrong token");
             Project newPro = new Project() { pName = pName, Discribe = Discribe };
-            newPro = _workContext.projects.Add(newPro).Entity;
+            //newPro = _workContext.projects.Add(newPro).Entity;
+            _workContext.projects.Add(newPro);            
             _workContext.SaveChanges();
+            //SaveChanges后newPro.Id变为自增序列
+            //检查是否存在文件夹
+            string subPath = Path.Combine(_hostingEnvironment.WebRootPath, "works", newPro.Id.ToString());
+            if (!System.IO.Directory.Exists(subPath))
+            {
+                System.IO.Directory.CreateDirectory(subPath);
+            }
             //return Ok(new { newPro });
             return RedirectToAction("Project", "Home");
-        }        
-        
+        }
+
+        [HttpGet("/api/[action]/{id}")]
+        public IActionResult Project(int id)
+        {
+            return Ok(new
+            {
+                type = "works",
+                res = _workContext.works.Where(item => item.proj.Id == id).Include(w => w.proj).Include(w => w.imgs).OrderByDescending(w => w.editTime).ToArray()
+            });
+        }
+
     }
 }

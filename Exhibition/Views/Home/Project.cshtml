@@ -37,7 +37,7 @@
         </div>
         <div class="col-md-3" style="background-color: #dedef8;box-shadow: inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
             <h4>新增项目信息</h4>
-            <form role="form"  method="post" asp-controller="Work" asp-action="NewProject">
+            <form role="form" method="post" asp-controller="Work" asp-action="NewProject">
                 <div class="form-group">
                     <label for="name">项目名称</label>
                     <input type="text" class="form-control" name="pName" placeholder="请输入名称">
@@ -49,6 +49,10 @@
 应用领域：
 项目信息：
 </textarea>
+                </div>
+                <div class="form-group">
+                    <label for="name">密码</label>
+                    <input type="password" class="form-control" name="token" placeholder="请输入密码">
                 </div>
                 <button type="submit" class="btn btn-default">提交</button>
                 <br />

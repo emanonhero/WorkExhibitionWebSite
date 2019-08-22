@@ -31,7 +31,9 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\" />
-    <Folder Include="wwwroot\works\" />
+    <Folder Include="wwwroot\works\1\" />
+    <Folder Include="wwwroot\works\2\" />
+    <Folder Include="wwwroot\works\3\" />
   </ItemGroup>
 
 </Project>
