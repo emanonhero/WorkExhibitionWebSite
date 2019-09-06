@@ -108,7 +108,7 @@ namespace Exhibition.Controllers
         }
         public IActionResult NewWork()
         {
-            ViewData["Message"] = "不能上传与项目直接相关的作品，至少上传一张一片或者视频至作品集。";
+            ViewData["Message"] = "一次上传所有文件大小总和限制为500MB，至少上传一张一片或者视频至作品集。";
             ViewData["Projects"] = _workContext.projects.ToList();
             return View();
         }
