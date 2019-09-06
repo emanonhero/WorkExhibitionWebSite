@@ -126,6 +126,8 @@ namespace Exhibition.Controllers
             return fileName.Substring(0, Math.Min(20, fileName.Length)) + "_" + System.Guid.NewGuid().ToString();
         }
         [HttpPost("[action]")]
+        [RequestSizeLimit(500_000_000)] //最大100m左右//Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException: Request body too large.
+        //[DisableRequestSizeLimit]  //或者取消大小的限制 https://www.jianshu.com/p/738094dafd52
         public async Task<IActionResult> UploadNewWorkItem(List<IFormFile> files, [FromForm]string name, [FromForm]string discribe,[FromForm]string author,[FromForm]int projId, [FromForm]string[] imgDiscribe)
         {
             WorkItem newWork = new WorkItem(name, discribe);
@@ -146,7 +148,7 @@ namespace Exhibition.Controllers
                     {
                         await formFile.CopyToAsync(stream);
                     }
-                    newWork.imgs.Add(new ImgOrVideo() { Src = "~/works/"+ projId.ToString()+"/" + newFileName ,Discribe=imgDiscribe[i]});
+                    newWork.imgs.Add(new ImgOrVideo() { Src = "~/works/"+ projId.ToString()+"/" + newFileName ,Discribe=imgDiscribe[i]==null? formFile.FileName +" "+ discribe : imgDiscribe[i] });
                 }
             }
 
@@ -159,7 +161,8 @@ namespace Exhibition.Controllers
             //Console.WriteLine(DateTime.Parse(newWork.editTime));
             _workContext.works.Add(newWork);
             _workContext.SaveChanges();
-            return Ok(new { count = files.Count, size, newWork });
+            //return Ok(new { count = files.Count, size, newWork });
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost("[action]")]
